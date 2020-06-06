@@ -6,11 +6,20 @@
 		<aside id="colorlib-aside" role="complementary" class="js-fullheight">
 			<nav id="colorlib-main-menu" role="navigation">
 				<ul>
-					<li class="colorlib-active"><a href="index.html">Home</a></li>
-					<li><a href="fashion.html">Fashion</a></li>
-					<li><a href="travel.html">Travel</a></li>
-					<li><a href="about.html">About</a></li>
-					<li><a href="contact.html">Contact</a></li>
+                    <li class="colorlib-active"><a href="index.html">Home</a></li>
+					@guest
+					<li><a href="{{route('login')}}">Login</a></li>
+					<li><a href="{{route('register')}}">Register</a></li>
+                    @endguest
+					@auth
+                    <li><a href="{{route('myposts')}}">My posts</a></li>
+					<li>
+                        <a href="#" onclick="event.preventDefault(); document.querySelector('#form-logout').submit()">Logout</a>
+                        <form method="POST" id="form-logout" action="{{route('logout')}}" style="display: none;">
+                            {{ csrf_field() }}
+                        </form>
+                    </li>
+                    @endauth
 				</ul>
 			</nav>
 
@@ -38,52 +47,51 @@
                     <!--POSTS COL-->
 	    			<div class="col-xl-8 py-5 px-md-5">
 
-                        @foreach ($posts as $post)
-                        <div class="col-md-12">
-                            <div class="blog-entry-2 ftco-animate">
-                                <div class="text pt-4">
-                                    <h3 class="mb-2"><a href="#">{{$post->title}}</a></h3>
-                                    <p class="mb-4">{{$post->description}}</p>
-                                    <div class="author mb-4 d-flex align-items-center">
-                                        <a href="#" class="img" style="background-image: url(images/image_1.jpg);"></a>
-                                        <div class="ml-3 info">
-                                            <span>Written by</span>
-                                            <h3><a href="#">{{$post->author->name}}</a>, <span>{{$post->created_at->format('F j, Y')}}</span></h3>
+                        @if (isset($current_category))
+                            <h1>{{$current_category->title}}</h1>
+                            <hr>
+                        @else
+                            <h1>Recent posts</h1>
+                            <hr>
+                        @endif
+                        
+                        @if (count($posts) > 0)
+                            @foreach ($posts as $post)
+                            <div class="col-md-12">
+                                <div class="blog-entry-2 ftco-animate">
+                                    <div class="text pt-4">
+                                        <h3 class="mb-2"><a href="#">{{$post->title}}</a></h3>
+                                        <p class="mb-4">{{$post->description}}</p>
+                                        <div class="author mb-4 d-flex align-items-center">
+                                            <a href="#" class="img" style="background-image: url(images/image_1.jpg);"></a>
+                                            <div class="ml-3 info">
+                                                <span>Written by</span>
+                                                <h3><a href="#">{{$post->author->name}}</a>, <span>{{$post->created_at->format('F j, Y')}}</span></h3>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="meta-wrap d-md-flex align-items-center">
-                                        <div class="half order-md-last text-md-right">
-                                            <p class="meta">
-                                                <span><i class="icon-heart"></i>3</span>
-                                                <span><i class="icon-eye"></i>100</span>
-                                                <span><i class="icon-comment"></i>{{$post->comments->count()}}</span>
-                                            </p>
-                                        </div>
-                                        <div class="half">
-                                            <p><a href="{{route('post', $post->id)}}" class="btn btn-primary p-3 px-xl-4 py-xl-3">Continue Reading</a></p>
+                                        <div class="meta-wrap d-md-flex align-items-center">
+                                            <div class="half order-md-last text-md-right">
+                                                <p class="meta">
+                                                    <span><i class="icon-heart"></i>3</span>
+                                                    <span><i class="icon-eye"></i>100</span>
+                                                    <span><i class="icon-comment"></i>{{$post->comments->count()}}</span>
+                                                </p>
+                                            </div>
+                                            <div class="half">
+                                                <p><a href="{{route('post', $post->id)}}" class="btn btn-primary p-3 px-xl-4 py-xl-3">Continue Reading</a></p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        @endforeach
-
-                        <!--PAGINATION LINKS-->
-			    		<div class="row">
-                            <div class="col">
-                                <div class="block-27">
-                                <ul>
-                                    <li><a href="#">&lt;</a></li>
-                                    <li class="active"><span>1</span></li>
-                                    <li><a href="#">2</a></li>
-                                    <li><a href="#">3</a></li>
-                                    <li><a href="#">4</a></li>
-                                    <li><a href="#">5</a></li>
-                                    <li><a href="#">&gt;</a></li>
-                                </ul>
-                                </div>
-                            </div>
-                        </div>
+                            @endforeach
+                        
+                            <!--PAGINATION LINKS-->
+                            {{$posts->withQueryString()->links('pagination')}}
+                        @else
+                            <h1>No posts availiable</h1>
+                        @endif
+                        
                     </div><!--END POSTS COL-->
 
                     <!--CATEGORIES COL-->
@@ -102,7 +110,7 @@
                         <ul class="categories">
                             
                             @foreach ($categories as $category)
-                                <li><a href="#">{{$category->title}}<span>({{$category->posts->count()}})</span></a></li>
+                                <li><a href="{{route('home', ['category' => $category->id])}}">{{$category->title}}<span>({{$category->posts->count()}})</span></a></li>
                             @endforeach
                             
                         </ul>

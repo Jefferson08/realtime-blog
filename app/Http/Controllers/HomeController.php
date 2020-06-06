@@ -23,14 +23,26 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function index()
+    public function index(Request $request)
     {
-        $posts = Post::all();
-        $categories = Category::all();
 
-        return view('home')->with([
-            'posts' => $posts,
-            'categories' => $categories
-        ]);
+        $data = array();
+
+        if($request->query('category')){
+            $category_id = $request->query('category');
+
+            if(Category::where('id', $category_id)->exists()){
+                $data['posts'] = Post::where('category_id', $category_id)->paginate(1);
+                $data['current_category'] = Category::find($category_id);
+            } else {
+                return redirect('home');
+            }
+        } else {
+            $data['posts'] = Post::paginate(1);
+        }
+
+        $data['categories'] = Category::all();
+
+        return view('home')->with($data);
     }
 }
