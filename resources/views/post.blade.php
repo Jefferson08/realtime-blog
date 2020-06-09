@@ -15,20 +15,25 @@
                             <h3><a href="#">{{$post->author->name}}</a>, <span>{{$post->created_at->format('F j, Y')}}</span></h3>
                         </div>
                     </div>
+
+                    <hr style="width: 100%;">
                     
-                    <div class="tag-widget post-tag-container mb-3 mt-3">
+                    <div class="tag-widget post-tag-container mb-3 mt-3" style="width: 100%;">
                         <div class="tagcloud">
-                            <a href="#" class="tag-cloud-link">Life</a>
-                            <a href="#" class="tag-cloud-link">Sport</a>
-                            <a href="#" class="tag-cloud-link">Tech</a>
-                            <a href="#" class="tag-cloud-link">Travel</a>
-                            <a href="#" class="tag-cloud-link">Travel</a>
-                            <a href="#" class="tag-cloud-link">Travel</a>
-                            <a href="#" class="tag-cloud-link">Travel</a>
-                            <a href="#" class="tag-cloud-link">Travel</a>
-                            <a href="#" class="tag-cloud-link">Travel</a>
-                            <a href="#" class="tag-cloud-link">Travel</a>
+                           @isset($tags)
+                            @foreach ($tags as $tag)
+                            <a href="#" class="tag-cloud-link">{{$tag}}</a>
+                            @endforeach
+                           @endisset
                         </div>
+                    </div>
+
+                    <div class="half order-md-left text-md-left" style="width: 100%;">
+                        <p class="meta">
+                            <span><i class="icon-heart-o"></i> {{$post->likes->count()}}</span>
+                            <span><i class="icon-eye"></i> {{$post->views_count}}</span>
+                            <span><i class="icon-comment"></i> {{$post->comments->count()}}</span>
+                        </p>
                     </div>
 
                     <div class="pt-2 mt-2">
@@ -81,7 +86,7 @@
                     <h3 class="sidebar-heading">Categories</h3>
                     <ul class="categories">
                         @foreach ($categories as $category)
-                            <li><a href="#">{{$category->title}} <span>({{$category->posts->count()}})</span></a></li>
+                            <li><a href="{{route('home', ['category' => $category->id])}}">{{$category->title}} <span>({{$category->posts->count()}})</span></a></li>
                         @endforeach                        
                     </ul>
                 </div>

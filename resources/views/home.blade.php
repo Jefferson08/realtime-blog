@@ -6,7 +6,7 @@
 		<aside id="colorlib-aside" role="complementary" class="js-fullheight">
 			<nav id="colorlib-main-menu" role="navigation">
 				<ul>
-                    <li class="colorlib-active"><a href="index.html">Home</a></li>
+                    <li class="colorlib-active"><a href="{{route('home')}}">Home</a></li>
 					@guest
 					<li><a href="{{route('login')}}">Login</a></li>
 					<li><a href="{{route('register')}}">Register</a></li>
@@ -14,7 +14,7 @@
 					@auth
                     <li><a href="{{route('myposts')}}">My posts</a></li>
 					<li>
-                        <a href="#" onclick="event.preventDefault(); document.querySelector('#form-logout').submit()">Logout</a>
+                        <a href="" onclick="event.preventDefault(); document.querySelector('#form-logout').submit()">Logout</a>
                         <form method="POST" id="form-logout" action="{{route('logout')}}" style="display: none;">
                             {{ csrf_field() }}
                         </form>
@@ -72,8 +72,8 @@
                                         <div class="meta-wrap d-md-flex align-items-center">
                                             <div class="half order-md-last text-md-right">
                                                 <p class="meta">
-                                                    <span><i class="icon-heart"></i>3</span>
-                                                    <span><i class="icon-eye"></i>100</span>
+                                                    <span><i class="icon-heart"></i>{{$post->likes->count()}}</span>
+                                                    <span><i class="icon-eye"></i>{{$post->views_count}}</span>
                                                     <span><i class="icon-comment"></i>{{$post->comments->count()}}</span>
                                                 </p>
                                             </div>

@@ -10,11 +10,20 @@ class PostController extends Controller
 {
     public function index(Post $post){
 
-        $categories = Category::all();
+        $data = array();
 
-        return view('post')->with([
-            'post' => $post,
-            'categories' => $categories
-        ]);
+        $data['post'] = $post;
+
+        $categories = Category::all();
+        $data['categories'] = $categories;
+
+        if($post->tags){
+            $tags = explode(' ', $post->tags->content);
+            $data['tags'] = $tags;
+        }
+
+        $post->increment('views_count');
+
+        return view('post')->with($data);
     }
 }
