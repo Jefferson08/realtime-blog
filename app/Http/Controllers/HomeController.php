@@ -32,13 +32,13 @@ class HomeController extends Controller
             $category_id = $request->query('category');
 
             if(Category::where('id', $category_id)->exists()){
-                $data['posts'] = Post::where('category_id', $category_id)->paginate(1);
+                $data['posts'] = Post::where('category_id', $category_id)->orderBy('created_at', 'desc')->paginate(1);
                 $data['current_category'] = Category::find($category_id);
             } else {
                 return redirect('home');
             }
         } else {
-            $data['posts'] = Post::paginate(1);
+            $data['posts'] = Post::orderBy('created_at', 'desc')->paginate(1);
         }
 
         $data['categories'] = Category::all();
