@@ -58,8 +58,8 @@
                         @if (count($posts) > 0)
                             @foreach ($posts as $post)
                             <div class="col-md-12">
-                                <div class="blog-entry-2 ftco-animate">
-                                    <div class="text pt-4">
+                                <div class="blog-entry-2 ftco-animate" style="margin-bottom: 10px;">
+                                    <div class="text">
                                         <h3 class="mb-2"><a href="#">{{$post->title}}</a></h3>
                                         <p class="mb-4">{{$post->description}}</p>
                                         <div class="author mb-4 d-flex align-items-center">
@@ -78,11 +78,12 @@
                                                 </p>
                                             </div>
                                             <div class="half">
-                                                <p><a href="{{route('post', $post->id)}}" class="btn btn-primary p-3 px-xl-4 py-xl-3">Continue Reading</a></p>
+                                                <p><a href="{{route('posts.show', $post->id)}}" class="btn btn-primary p-3 px-xl-4 py-xl-3">Continue Reading</a></p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                                <hr>
                             </div>
                             @endforeach
                         

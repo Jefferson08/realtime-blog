@@ -19,7 +19,10 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
-Route::get('/post/{post}', 'PostController@index')->name('post');
+Route::resource('posts', 'PostController');
+
+Route::get('/home', function(){
+    return redirect('posts');
+})->name('home');
 
 Route::get('myposts', 'UserController@posts')->name('myposts');
