@@ -12,7 +12,8 @@ class PostController extends Controller
 {
 
     public function __construct(){
-        $this->middleware('auth', ['except' => ['index', 'show']]);
+        $this->middleware('auth')->except(['index', 'show']);
+        $this->middleware('can:update-post,post')->only(['edit', 'update', 'destroy']);
     }
 
     /**
@@ -92,7 +93,7 @@ class PostController extends Controller
         
         $post->save();
 
-        return redirect()->route('myposts')->with('success', 'Página criada com sucesso!!!');
+        return redirect()->route('myposts')->with('success', 'Post created!!!');
     }
 
     /**
@@ -128,7 +129,14 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        //
+        $data = array();
+
+        $categories = Category::all();
+
+        $data['post'] = $post;
+        $data['categories'] = $categories;
+
+        return view('posts.edit')->with($data);
     }
 
     /**
@@ -140,7 +148,34 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        //
+        $data = $request->only([
+            'title',
+            'description',
+            'category',
+            'body'
+        ]);
+
+        $validator = Validator::make($data, [
+            'title' => ['required', 'string', 'max:100'],
+            'description' => ['required', 'string', 'max:255'],
+            'category' => 'exists:App\Category,id',
+            'body' => ['required', 'string']
+        ]);
+
+        if($validator->fails()){
+            return redirect()->route('posts.create')
+            ->withErrors($validator)
+            ->withInput();
+        }
+        
+        $post->title = $data['title'];
+        $post->description = $data['description'];
+        $post->body = $data['body'];
+        $post->category_id = intval($data['category']);
+        
+        $post->save();
+
+        return redirect()->route('myposts')->with('success', 'Post updated!!!');
     }
 
     /**
@@ -151,6 +186,7 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        //
+        $post->delete();
+        return redirect()->route('myposts')->with('success', 'Post deleted!!!');
     }
 }
