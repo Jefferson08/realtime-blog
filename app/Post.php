@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Post extends Model
 {
@@ -24,5 +25,14 @@ class Post extends Model
  
     public function likes(){
         return $this->hasMany('\App\Like', 'post_id', 'id');
+    }
+
+    public function liked(){
+
+        if(Like::where(['post_id' => $this->id, 'user_id' => Auth::id()])->exists()){
+            return true;
+        } else{
+            return false;
+        }
     }
 }

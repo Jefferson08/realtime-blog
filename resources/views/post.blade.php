@@ -30,9 +30,11 @@
 
                     <div class="half order-md-left text-md-left" style="width: 100%;">
                         <p class="meta">
-                            <span><i class="icon-heart-o"></i> {{$post->likes->count()}}</span>
-                            <span><i class="icon-eye"></i> {{$post->views_count}}</span>
-                            <span><i class="icon-comment"></i> {{$post->comments->count()}}</span>
+                            <span>
+                                <i class="{{ ($post->liked()) ? "icon-heart" : "icon-heart-o"}}" id="like"> {{$post->likes->count()}}</i> 
+                            </span>
+                            <span><i class="icon-eye"> {{$post->views_count}}</i></span>
+                            <span><i class="icon-comment"> {{$post->comments->count()}}</i></span>
                         </p>
                     </div>
 
@@ -95,4 +97,46 @@
         </div>
     </div>
 </section>
+
+@section('scripts')
+   <script>
+
+        function toggleLike() {
+            $('#like').toggleClass("icon-heart-o")
+            $('#like').toggleClass("icon-heart")
+        }
+
+        $(function(){
+            $('#like').click(function(){
+                $.ajax({
+                    url: "{{route('like', $post)}}",
+                    type: "GET",
+                    dataType: "json",
+                    success: function(response){
+                        if (response.success === true) {
+                            if (response.liked === true) {
+                                toggleLike();
+                                var likes = parseInt($('#like').html());
+                                likes++;
+                                $('#like').html(" "+ likes);
+                            } else {
+                                toggleLike();
+                                var likes = parseInt($('#like').html());
+                                likes--;
+                                $('#like').html(" "+ likes);
+                            }
+                        }
+                    },
+                    statusCode:{
+                        401: function(){
+                            alert("You must be logged in to like this post!!!");
+                            window.location.href = "{{route('login')}}";
+                        }
+                    }
+                });
+            });
+        });
+   </script>
+@endsection
+
 @endsection

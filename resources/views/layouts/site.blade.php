@@ -48,5 +48,7 @@
     <script src="{{asset('js/jquery.animateNumber.min.js')}}"></script>
     <script src="{{asset('js/scrollax.min.js')}}"></script>
     <script src="{{asset('js/main.js')}}"></script>
+
+    @yield('scripts')
 </body>
 </html>

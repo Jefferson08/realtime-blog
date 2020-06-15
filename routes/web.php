@@ -25,4 +25,6 @@ Route::get('/home', function(){
     return redirect('posts');
 })->name('home');
 
+Route::get('/like/{post}', 'PostController@like')->name('like');
+
 Route::get('myposts', 'UserController@posts')->name('myposts');
