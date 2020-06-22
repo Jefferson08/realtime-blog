@@ -85,7 +85,26 @@
                 </div>
 
                 <div class="sidebar-box ftco-animate">
-                    <h3 class="sidebar-heading">Categories</h3>
+                    <h3 class="sidebar-heading">Links:</h3>
+                    <ul class="categories">
+                        <li><a href="{{ route('home')}}">Home</a></li>
+                        @guest
+                        <li><a href="{{ route('login')}}">Login</a></li>
+                        <li><a href="{{ route('register')}}">Register</a></li>
+                        @endguest
+                        @auth
+                        <li><a href="{{ route('myposts')}}">My Posts</a></li>
+                        <li><a href="{{ route('users.edit', Auth::user())}}">Profile</a></li>
+                        <li>
+                            <a href="" onclick="event.preventDefault(); document.querySelector('#form-logout').submit()">Logout</a>
+                            <form method="POST" id="form-logout" action="{{route('logout')}}" style="display: none;">
+                                {{ csrf_field() }}
+                            </form>
+                        </li>
+                        @endauth
+                    </ul>
+                    <hr>
+                    <h3 class="sidebar-heading">Categories:</h3>
                     <ul class="categories">
                         @foreach ($categories as $category)
                             <li><a href="{{route('home', ['category' => $category->id])}}">{{$category->title}} <span>({{$category->posts->count()}})</span></a></li>

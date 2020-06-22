@@ -27,4 +27,7 @@ Route::get('/home', function(){
 
 Route::get('/like/{post}', 'PostController@like')->name('like');
 
+Route::get('/users/{user}', 'UserController@edit')->name('users.edit');
+Route::put('/users/{user}', 'UserController@update')->name('users.update');
+
 Route::get('myposts', 'UserController@posts')->name('myposts');

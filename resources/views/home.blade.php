@@ -13,6 +13,7 @@
                     @endguest
 					@auth
                     <li><a href="{{route('myposts')}}">My posts</a></li>
+                    <li><a href="{{route('users.edit', Auth::user())}}">Profile</a></li>
 					<li>
                         <a href="" onclick="event.preventDefault(); document.querySelector('#form-logout').submit()">Logout</a>
                         <form method="POST" id="form-logout" action="{{route('logout')}}" style="display: none;">

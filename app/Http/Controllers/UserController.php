@@ -3,13 +3,60 @@
 namespace App\Http\Controllers;
 
 use App\Post;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
     public function __construct(){
         $this->middleware('auth');
+        $this->middleware('can:edit-user,user')->only(['edit', 'update']);
+    }
+
+    public function edit(User $user){
+        return view('users.edit')->with('user', $user);
+    }
+
+    public function update(Request $request, User $user){
+        
+        $data = $request->only([
+            'name',
+            'email',
+            'password',
+            'password_confirmation'
+        ]);
+
+        $validation = [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+        ];
+
+        if($data['password']){
+            $validation['password'] = ['required', 'string', 'min:8', 'confirmed'];
+        }
+
+        $validator = Validator::make($data, $validation);
+
+        if($validator->fails()){
+            return redirect()->route('users.edit', $user)
+            ->withErrors($validator);
+        }
+
+        $user->name = $data['name'];
+        $user->email = $data['email'];
+
+        if($data['password']){
+            $user->password = Hash::make($data['password']);
+        }
+
+        $user->save();
+
+        return redirect()->route('users.edit', $user)->with('success', 'Dados alterados com sucesso!!!');
+
     }
 
     public function posts(){
