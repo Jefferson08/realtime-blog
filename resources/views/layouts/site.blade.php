@@ -27,6 +27,8 @@
     <link rel="stylesheet" href="{{asset('css/flaticon.css')}}">
     <link rel="stylesheet" href="{{asset('css/icomoon.css')}}">
     <link rel="stylesheet" href="{{asset('css/style.css')}}">
+
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 </head>
 <body>
 
@@ -48,6 +50,7 @@
     <script src="{{asset('js/jquery.animateNumber.min.js')}}"></script>
     <script src="{{asset('js/scrollax.min.js')}}"></script>
     <script src="{{asset('js/main.js')}}"></script>
+    <script src="{{ asset('js/app.js') }}" defer></script>
 
     @yield('scripts')
 </body>

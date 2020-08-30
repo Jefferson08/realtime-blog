@@ -34,42 +34,16 @@
                                 <i class="{{ ($post->liked()) ? "icon-heart" : "icon-heart-o"}}" id="like"> {{$post->likes->count()}}</i> 
                             </span>
                             <span><i class="icon-eye"> {{$post->views_count}}</i></span>
-                            <span><i class="icon-comment"> {{$post->comments->count()}}</i></span>
                         </p>
                     </div>
 
                     <div class="pt-2 mt-2">
-                        <h3 class="mb-4 font-weight-bold">{{$post->comments->count()}} Comments</h3>
-                        <ul class="comment-list">
-                            
-                            @foreach ($post->comments as $comment)
-                                <li class="comment">
-                                    <div class="vcard bio">
-                                        <img src="{{asset('images/image_1.jpg')}}" alt="Image placeholder">
-                                    </div>
-                                    <div class="comment-body">
-                                        <h3>{{$comment->author->name}}</h3>
-                                        <div class="meta">{{$comment->created_at->format('F j, Y \a\t H:ia')}}</div>
-                                        <p>{{$comment->body}}</p>
-                                    </div>
-                                </li>
-                            @endforeach
-                           
-                        </ul>
+                        <div id="comments">
+                            <comments-component v-bind:post_id="{{$post->id}}"></comments-component>
+                        </div>
+                        
                         <!-- END comment-list -->
                     
-                        <div class="comment-form-wrap pt-2">
-                            <h3 class="mb-3">Leave a comment</h3>
-                            <form action="#" class="p-3 p-md-5 bg-light">
-                                <div class="form-group">
-                                    <label for="message">Message</label>
-                                    <textarea name="" id="message" cols="30" rows="5" class="form-control"></textarea>
-                                </div>
-                                <div class="form-group">
-                                    <input type="submit" value="Post Comment" class="btn py-3 px-4 btn-primary">
-                                </div>
-                            </form>
-                        </div>
                     </div>
                 </div><!-- END-->
             </div>
