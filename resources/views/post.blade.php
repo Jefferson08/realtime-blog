@@ -37,7 +37,7 @@
                         </p>
                     </div>
 
-                    <div class="pt-2 mt-2">
+                    <div class="pt-2 mt-2" style="width: 100%;">
                         <div id="comments">
                             <comments-component v-bind:post_id="{{$post->id}}"></comments-component>
                         </div>

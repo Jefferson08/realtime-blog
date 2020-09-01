@@ -12,9 +12,15 @@
       </li>
     </ul>
 
+    <button class="btn btn-success" style="width: 100%;" v-on:click="loadMoreComments()">
+      <div class="spinner-border" role="status" v-if="this.loading"></div>
+      <span v-else>Load more comments</span>
+    </button>
+    <hr />
+
     <div class="comment-form-wrap pt-2">
       <h3 class="mb-3">Leave a comment</h3>
-      <form @submit.prevent class="p-3 p-md-5 bg-light">
+      <form @submit.prevent class="p-3 bg-light">
         <div class="form-group">
           <label for="message">Message</label>
           <textarea v-model="message" id="message" cols="30" rows="5" class="form-control"></textarea>
@@ -38,7 +44,9 @@ export default {
     return {
       comments: [],
       comments_count: 0,
+      page: 1,
       message: "",
+      loading: false,
     };
   },
   mounted() {
@@ -47,10 +55,15 @@ export default {
   },
   methods: {
     loadComments: function () {
-      axios.get("/api/comments/" + this.$attrs.post_id).then((response) => {
-        this.comments = response.data;
-        this.comments_count = this.comments.length;
-      });
+      axios
+        .get("/api/comments/" + this.$attrs.post_id)
+        .then((response) => {
+          this.comments = response.data.comments;
+          this.comments_count = response.data.comments_count;
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
     },
     addComment: function () {
       axios
@@ -58,8 +71,29 @@ export default {
           message: this.message,
         })
         .then((response) => {
-          this.comments.push(response.data);
+          this.comments.unshift(response.data);
           this.comments_count++;
+        })
+        .catch((error) => {
+          if (error.response.status == 401) {
+            alert("You must be logged in to post a comment");
+          }
+        });
+    },
+    loadMoreComments: function () {
+      this.page++;
+      this.loading = true;
+      axios
+        .get("/api/comments/" + this.$attrs.post_id + "?page=" + this.page)
+        .then((response) => {
+          response.data.comments.map((comment) => {
+            this.comments.push(comment);
+          });
+
+          this.loading = false;
+        })
+        .catch(function (error) {
+          console.log(error);
         });
     },
   },

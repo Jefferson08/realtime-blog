@@ -1942,12 +1942,20 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       comments: [],
       comments_count: 0,
-      message: ""
+      page: 1,
+      message: "",
+      loading: false
     };
   },
   mounted: function mounted() {
@@ -1959,8 +1967,10 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       axios.get("/api/comments/" + this.$attrs.post_id).then(function (response) {
-        _this.comments = response.data;
-        _this.comments_count = _this.comments.length;
+        _this.comments = response.data.comments;
+        _this.comments_count = response.data.comments_count;
+      })["catch"](function (error) {
+        console.log(error);
       });
     },
     addComment: function addComment() {
@@ -1969,9 +1979,27 @@ __webpack_require__.r(__webpack_exports__);
       axios.post("/api/comments/" + this.$attrs.post_id, {
         message: this.message
       }).then(function (response) {
-        _this2.comments.push(response.data);
+        _this2.comments.unshift(response.data);
 
         _this2.comments_count++;
+      })["catch"](function (error) {
+        if (error.response.status == 401) {
+          alert("You must be logged in to post a comment");
+        }
+      });
+    },
+    loadMoreComments: function loadMoreComments() {
+      var _this3 = this;
+
+      this.page++;
+      this.loading = true;
+      axios.get("/api/comments/" + this.$attrs.post_id + "?page=" + this.page).then(function (response) {
+        response.data.comments.map(function (comment) {
+          _this3.comments.push(comment);
+        });
+        _this3.loading = false;
+      })["catch"](function (error) {
+        console.log(error);
       });
     }
   }
@@ -37587,13 +37615,36 @@ var render = function() {
       0
     ),
     _vm._v(" "),
+    _c(
+      "button",
+      {
+        staticClass: "btn btn-success",
+        staticStyle: { width: "100%" },
+        on: {
+          click: function($event) {
+            return _vm.loadMoreComments()
+          }
+        }
+      },
+      [
+        this.loading
+          ? _c("div", {
+              staticClass: "spinner-border",
+              attrs: { role: "status" }
+            })
+          : _c("span", [_vm._v("Load more comments")])
+      ]
+    ),
+    _vm._v(" "),
+    _c("hr"),
+    _vm._v(" "),
     _c("div", { staticClass: "comment-form-wrap pt-2" }, [
       _c("h3", { staticClass: "mb-3" }, [_vm._v("Leave a comment")]),
       _vm._v(" "),
       _c(
         "form",
         {
-          staticClass: "p-3 p-md-5 bg-light",
+          staticClass: "p-3 bg-light",
           on: {
             submit: function($event) {
               $event.preventDefault()

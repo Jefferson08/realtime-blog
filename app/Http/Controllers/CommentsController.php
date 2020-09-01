@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Auth;
 class CommentsController extends Controller
 {
 
-    public function __construct(){
+    public function __construct()
+    {
         $this->middleware('auth')->except('index');
     }
 
@@ -19,22 +20,27 @@ class CommentsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Post $post){
-        $comments = array();
+    public function index(Post $post)
+    {
 
-        foreach ($post->comments as $item) {
-           $comment = array();
+        $data = array();
+        $data['comments'] = array();
+        $data['comments_count'] = $post->comments->count();
 
-           $comment['id'] = $item->id;
-           $comment['author'] = $item->author->name;
-           $comment['created_at'] = $item->created_at->format('F j, Y \a\t H:ia');
-           $comment['body'] = $item->body;
+        $comments = Comment::where('post_id', $post->id)->orderBy('created_at', 'DESC')->paginate(3);
 
-           array_push($comments, $comment);
+        foreach ($comments as $item) {
+            $comment = array();
 
+            $comment['id'] = $item->id;
+            $comment['author'] = $item->author->name;
+            $comment['created_at'] = $item->created_at->format('F j, Y \a\t H:ia');
+            $comment['body'] = $item->body;
+
+            array_push($data['comments'], $comment);
         }
 
-        return $comments;
+        return $data;
     }
 
     /**
@@ -45,7 +51,7 @@ class CommentsController extends Controller
      */
     public function store(Request $request, Post $post)
     {
-        
+
         $response = array();
 
         $comment = new Comment();
@@ -62,7 +68,6 @@ class CommentsController extends Controller
         $response['body'] = $comment->body;
 
         return $response;
-        
     }
 
     /**
@@ -71,7 +76,7 @@ class CommentsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    
+
     public function destroy($id)
     {
         //
