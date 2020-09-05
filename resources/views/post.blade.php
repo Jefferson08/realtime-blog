@@ -6,7 +6,8 @@
         <div class="row d-flex">
             <div class="col-lg-8 px-md-5 py-5">
                 <div class="row pt-md-4">
-                    <h1 class="mb-3"style="width: 100%;">{{$post->title}}</h1>
+                    <div class="container">
+                        <h1 class="mb-3"style="width: 100%;">{{$post->title}}</h1>
                     <p>{{$post->body}}</p>
                    
                     <div class="author mb-2 d-flex align-items-center" style="width: 100%;">
@@ -44,6 +45,7 @@
                         
                         <!-- END comment-list -->
                     
+                    </div>
                     </div>
                 </div><!-- END-->
             </div>

@@ -78,8 +78,8 @@
                                                     <span><i class="icon-comment"></i>{{$post->comments->count()}}</span>
                                                 </p>
                                             </div>
-                                            <div class="half">
-                                                <p><a href="{{route('posts.show', $post->id)}}" class="btn btn-primary p-3 px-xl-4 py-xl-3">Continue Reading</a></p>
+                                            <div>
+                                                <p><a href="{{route('posts.show', $post->id)}}" class="btn btn-primary p-3 px-xl-4 py-xl-3 w-100">Continue Reading</a></p>
                                             </div>
                                         </div>
                                     </div>
@@ -125,3 +125,5 @@
 		</div><!-- END COLORLIB-MAIN -->
 
 @endsection
+
+

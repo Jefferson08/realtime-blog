@@ -44,7 +44,8 @@ export default {
     return {
       comments: [],
       comments_count: 0,
-      page: 1,
+      page: 2,
+      page_index_count: 1,
       message: "",
       loading: false,
     };
@@ -52,6 +53,13 @@ export default {
   mounted() {
     console.log("Component mounted.");
     this.loadComments();
+
+    Echo.channel(`comments.`+ this.$attrs.post_id)
+        .listen('CommentEvent', (e) => {
+            this.comments_count++;
+            this.comments.unshift(e.comment);
+            this.comments.pop();
+        });
   },
   methods: {
     loadComments: function () {
@@ -81,14 +89,20 @@ export default {
         });
     },
     loadMoreComments: function () {
-      this.page++;
       this.loading = true;
+    
       axios
         .get("/api/comments/" + this.$attrs.post_id + "?page=" + this.page)
         .then((response) => {
-          response.data.comments.map((comment) => {
-            this.comments.push(comment);
-          });
+
+          if(response.data.comments.length !== 0){
+            response.data.comments.map((comment) => {
+              this.comments.push(comment);
+            });
+
+            this.page++;
+          }
+          
 
           this.loading = false;
         })

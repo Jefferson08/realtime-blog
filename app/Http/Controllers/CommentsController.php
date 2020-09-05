@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Comment;
+use App\Events\CommentEvent;
 use App\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -61,6 +62,8 @@ class CommentsController extends Controller
         $comment->body = $request->message;
 
         $comment->save();
+
+        broadcast(new CommentEvent($comment))->toOthers();
 
         $response['id'] = $comment->id;
         $response['author'] = $comment->author->name;
