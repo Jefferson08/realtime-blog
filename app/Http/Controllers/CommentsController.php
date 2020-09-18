@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Comment;
-use App\Events\CommentEvent;
+use App\Events\CommentDeleted;
+use App\Events\NewComment;
 use App\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class CommentsController extends Controller
 {
@@ -14,6 +16,7 @@ class CommentsController extends Controller
     public function __construct()
     {
         $this->middleware('auth')->except('index');
+        $this->middleware('can:delete-comment,comment')->only('destroy');
     }
 
     /**
@@ -37,6 +40,7 @@ class CommentsController extends Controller
             $comment['author'] = $item->author->name;
             $comment['created_at'] = $item->created_at->format('F j, Y \a\t H:ia');
             $comment['body'] = $item->body;
+            $comment['can_delete'] = Gate::allows('delete-comment', $item);
 
             array_push($data['comments'], $comment);
         }
@@ -63,12 +67,13 @@ class CommentsController extends Controller
 
         $comment->save();
 
-        broadcast(new CommentEvent($comment))->toOthers();
+        broadcast(new NewComment($comment))->toOthers();
 
         $response['id'] = $comment->id;
         $response['author'] = $comment->author->name;
         $response['created_at'] = $comment->created_at->format('F j, Y \a\t H:ia');
         $response['body'] = $comment->body;
+        $response['can_delete'] = Gate::allows('delete-comment', $comment);
 
         return $response;
     }
@@ -80,8 +85,18 @@ class CommentsController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function destroy($id)
+    public function destroy(Comment $comment)
     {
-        //
+        
+        $response = array();
+
+        broadcast(new CommentDeleted($comment))->toOthers();
+        
+        $comment->delete();
+
+        $response['message'] = "Comment successfully deleted!!";
+
+        return json_encode($response);
+
     }
 }

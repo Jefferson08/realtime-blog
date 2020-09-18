@@ -5,7 +5,18 @@
       <li class="comment" v-for="comment in comments" v-bind:key="comment.id">
         <div class="vcard bio"></div>
         <div class="comment-body">
-          <h3>{{comment.author}}</h3>
+          <div class="row">
+            <div class="col-6">
+              <h3>{{comment.author}}</h3>
+            </div>
+            <div class="col-6 text-right">
+              <button
+                v-if="comment.can_delete"
+                v-on:click="deleteComment(comment)"
+                class="btn btn-danger"
+              >Delete</button>
+            </div>
+          </div>
           <div class="meta">{{comment.created_at}}</div>
           <p>{{comment.body}}</p>
         </div>
@@ -54,12 +65,32 @@ export default {
     console.log("Component mounted.");
     this.loadComments();
 
-    Echo.channel(`comments.`+ this.$attrs.post_id)
-        .listen('CommentEvent', (e) => {
-            this.comments_count++;
-            this.comments.unshift(e.comment);
-            this.comments.pop();
-        });
+    Echo.channel(`comments.` + this.$attrs.post_id).listen(
+      "NewComment",
+      (e) => {
+        this.comments_count++;
+        this.comments.unshift(e.comment);
+        if(this.comments.length > 3){
+          this.comments.pop();
+        }
+      }
+    );
+
+    Echo.channel(`comment.deleted.` + this.$attrs.post_id).listen(
+      "CommentDeleted",
+      (e) => {
+
+        this.comments = this.comments.filter((comment)=>comment.id !== e.comment.id );
+        this.comments_count--;
+      }
+    );
+
+    Echo.private(`comments.` + this.$attrs.post_id).listen(
+      "CommentEvent",
+      (e) => {
+        console.log(e.comment.author + " Commented on your post!!");
+      }
+    );
   },
   methods: {
     loadComments: function () {
@@ -90,25 +121,41 @@ export default {
     },
     loadMoreComments: function () {
       this.loading = true;
-    
+
       axios
         .get("/api/comments/" + this.$attrs.post_id + "?page=" + this.page)
         .then((response) => {
-
-          if(response.data.comments.length !== 0){
+          if (response.data.comments.length !== 0) {
             response.data.comments.map((comment) => {
               this.comments.push(comment);
             });
 
             this.page++;
           }
-          
 
           this.loading = false;
         })
         .catch(function (error) {
           console.log(error);
         });
+    },
+    deleteComment: function (comment) {
+     if(window.confirm("Are you sure you want to delete this comment?")){
+        axios
+        .delete("/api/comments/" + comment.id)
+        .then((response) => {
+          alert(response.data.message);
+          this.comments.splice(this.comments.indexOf(comment), 1);
+          this.comments_count--;
+        })
+        .catch((error) => {
+          if (error.response.status == 401) {
+            alert("You must be logged in to delete a comment");
+          } else if(error.response.status == 403){
+            alert("Unauthorized");
+          }
+        });
+     }
     },
   },
 };

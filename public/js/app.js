@@ -1948,6 +1948,17 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -1964,12 +1975,23 @@ __webpack_require__.r(__webpack_exports__);
 
     console.log("Component mounted.");
     this.loadComments();
-    Echo.channel("comments." + this.$attrs.post_id).listen('CommentEvent', function (e) {
+    Echo.channel("comments." + this.$attrs.post_id).listen("NewComment", function (e) {
       _this.comments_count++;
 
       _this.comments.unshift(e.comment);
 
-      _this.comments.pop();
+      if (_this.comments.length > 3) {
+        _this.comments.pop();
+      }
+    });
+    Echo.channel("comment.deleted." + this.$attrs.post_id).listen("CommentDeleted", function (e) {
+      _this.comments = _this.comments.filter(function (comment) {
+        return comment.id !== e.comment.id;
+      });
+      _this.comments_count--;
+    });
+    Echo["private"]("comments." + this.$attrs.post_id).listen("CommentEvent", function (e) {
+      console.log(e.comment.author + " Commented on your post!!");
     });
   },
   methods: {
@@ -2014,6 +2036,25 @@ __webpack_require__.r(__webpack_exports__);
       })["catch"](function (error) {
         console.log(error);
       });
+    },
+    deleteComment: function deleteComment(comment) {
+      var _this5 = this;
+
+      if (window.confirm("Are you sure you want to delete this comment?")) {
+        axios["delete"]("/api/comments/" + comment.id).then(function (response) {
+          alert(response.data.message);
+
+          _this5.comments.splice(_this5.comments.indexOf(comment), 1);
+
+          _this5.comments_count--;
+        })["catch"](function (error) {
+          if (error.response.status == 401) {
+            alert("You must be logged in to delete a comment");
+          } else if (error.response.status == 403) {
+            alert("Unauthorized");
+          }
+        });
+      }
     }
   }
 });
@@ -43683,7 +43724,28 @@ var render = function() {
           _c("div", { staticClass: "vcard bio" }),
           _vm._v(" "),
           _c("div", { staticClass: "comment-body" }, [
-            _c("h3", [_vm._v(_vm._s(comment.author))]),
+            _c("div", { staticClass: "row" }, [
+              _c("div", { staticClass: "col-6" }, [
+                _c("h3", [_vm._v(_vm._s(comment.author))])
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "col-6 text-right" }, [
+                comment.can_delete
+                  ? _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-danger",
+                        on: {
+                          click: function($event) {
+                            return _vm.deleteComment(comment)
+                          }
+                        }
+                      },
+                      [_vm._v("Delete")]
+                    )
+                  : _vm._e()
+              ])
+            ]),
             _vm._v(" "),
             _c("div", { staticClass: "meta" }, [
               _vm._v(_vm._s(comment.created_at))
@@ -55977,7 +56039,7 @@ Vue.component('comments-component', __webpack_require__(/*! ./components/Comment
  */
 
 var app = new Vue({
-  el: '#comments'
+  el: '#app'
 });
 
 /***/ }),

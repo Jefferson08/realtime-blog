@@ -120,10 +120,20 @@
 
                     </div><!-- END CATEGORIES COL -->
 	    		</div><!--END MAIN ROW-->
-	    	</div>
+            </div>
+            
+            
+
 	    </section>
-		</div><!-- END COLORLIB-MAIN -->
+        </div><!-- END COLORLIB-MAIN -->
+
+        <div id="app">
+            
+        </div>
+        
+        
 
 @endsection
+
 
 

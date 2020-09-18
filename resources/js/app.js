@@ -28,5 +28,5 @@ Vue.component('comments-component', require('./components/CommentsComponent.vue'
  */
 
 const app = new Vue({
-    el: '#comments',
+    el: '#app',
 });
