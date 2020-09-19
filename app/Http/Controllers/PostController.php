@@ -30,13 +30,13 @@ class PostController extends Controller
             $category_id = $request->query('category');
 
             if(Category::where('id', $category_id)->exists()){
-                $data['posts'] = Post::where('category_id', $category_id)->orderBy('created_at', 'desc')->paginate(2);
+                $data['posts'] = Post::with('author')->where('category_id', $category_id)->orderBy('created_at', 'desc')->paginate(2);
                 $data['current_category'] = Category::find($category_id);
             } else {
                 return redirect('home');
             }
         } else {
-            $data['posts'] = Post::orderBy('created_at', 'desc')->paginate(2);
+            $data['posts'] = Post::with('author')->orderBy('created_at', 'desc')->paginate(2);
         }
 
         $data['categories'] = Category::all();

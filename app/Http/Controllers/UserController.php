@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Traits\MediaUploadingTrait;
 use App\Post;
 use App\User;
 use Illuminate\Http\Request;
@@ -12,6 +13,9 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
+
+    use MediaUploadingTrait;
+
     public function __construct(){
         $this->middleware('auth');
         $this->middleware('can:edit-user,user')->only(['edit', 'update']);
@@ -52,8 +56,23 @@ class UserController extends Controller
         if($data['password']){
             $user->password = Hash::make($data['password']);
         }
-
+        
         $user->save();
+
+        if ($request->input('photo', false)) {
+
+            if(file_exists(storage_path('tmp/uploads/' . $request->input('photo')))){
+
+                if ($user->photo) {
+                    $user->photo->delete();
+                }
+
+                $user->addMedia(storage_path('tmp/uploads/' . $request->input('photo')))->toMediaCollection('profile');
+            }
+
+        } elseif ($user->photo) {
+            $user->photo->delete();
+        }
 
         return redirect()->route('users.edit', $user)->with('success', 'Dados alterados com sucesso!!!');
 

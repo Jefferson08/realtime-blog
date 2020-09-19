@@ -1959,6 +1959,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -43721,7 +43723,11 @@ var render = function() {
       { staticClass: "comment-list" },
       _vm._l(_vm.comments, function(comment) {
         return _c("li", { key: comment.id, staticClass: "comment" }, [
-          _c("div", { staticClass: "vcard bio" }),
+          _c("div", { staticClass: "vcard bio" }, [
+            _c("img", {
+              attrs: { src: comment.profile_photo, alt: "Image placeholder" }
+            })
+          ]),
           _vm._v(" "),
           _c("div", { staticClass: "comment-body" }, [
             _c("div", { staticClass: "row" }, [

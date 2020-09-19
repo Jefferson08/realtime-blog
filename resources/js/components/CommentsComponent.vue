@@ -3,7 +3,9 @@
     <h3 class="mb-4 font-weight-bold">{{comments_count}} Comments</h3>
     <ul class="comment-list">
       <li class="comment" v-for="comment in comments" v-bind:key="comment.id">
-        <div class="vcard bio"></div>
+        <div class="vcard bio">
+          <img v-bind:src="comment.profile_photo" alt="Image placeholder">
+        </div>
         <div class="comment-body">
           <div class="row">
             <div class="col-6">

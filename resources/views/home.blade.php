@@ -64,7 +64,7 @@
                                         <h3 class="mb-2"><a href="#">{{$post->title}}</a></h3>
                                         <p class="mb-4">{{$post->description}}</p>
                                         <div class="author mb-4 d-flex align-items-center">
-                                            <a href="#" class="img" style="background-image: url(images/image_1.jpg);"></a>
+                                            <a href="#" class="img" style="background-image: url('{{ ($post->author->photo) ? $post->author->photo->getUrl('thumb') : asset('/images/default.png') }}');"></a>
                                             <div class="ml-3 info">
                                                 <span>Written by</span>
                                                 <h3><a href="#">{{$post->author->name}}</a>, <span>{{$post->created_at->format('F j, Y')}}</span></h3>

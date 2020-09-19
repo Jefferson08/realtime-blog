@@ -31,13 +31,20 @@ class CommentsController extends Controller
         $data['comments'] = array();
         $data['comments_count'] = $post->comments->count();
 
-        $comments = Comment::where('post_id', $post->id)->orderBy('created_at', 'DESC')->paginate(3);
+        $comments = Comment::with('author')->where('post_id', $post->id)->orderBy('created_at', 'DESC')->paginate(3);
 
         foreach ($comments as $item) {
             $comment = array();
 
             $comment['id'] = $item->id;
             $comment['author'] = $item->author->name;
+
+            if($item->author->photo){
+                $comment['profile_photo'] = $item->author->photo->getUrl('thumb');
+            } else {
+                $comment['profile_photo'] = asset('/images/default.png');
+            }
+
             $comment['created_at'] = $item->created_at->format('F j, Y \a\t H:ia');
             $comment['body'] = $item->body;
             $comment['can_delete'] = Gate::allows('delete-comment', $item);
@@ -68,6 +75,12 @@ class CommentsController extends Controller
         $comment->save();
 
         broadcast(new NewComment($comment))->toOthers();
+
+        if($comment->author->photo){
+            $response['profile_photo'] = $comment->author->photo->getUrl('thumb');
+        } else {
+            $response['profile_photo'] = asset('/images/default.png');
+        }
 
         $response['id'] = $comment->id;
         $response['author'] = $comment->author->name;

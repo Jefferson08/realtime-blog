@@ -47,10 +47,19 @@ class NewComment implements ShouldBroadcast
      */
     public function broadcastWith()
     {
+        $profile_photo = "";
+
+        if($this->comment->author->photo){
+            $profile_photo = $this->comment->author->photo->getUrl('thumb');
+        } else {
+            $profile_photo = asset('/images/default.png');
+        }
+
         return [
             'comment' => [
                 'id' => $this->comment->id,
                 'author' => $this->comment->author->name,
+                'profile_photo' => $profile_photo,
                 'created_at' => $this->comment->created_at->format('F j, Y \a\t H:ia'),
                 'body' => $this->comment->body
             ]
