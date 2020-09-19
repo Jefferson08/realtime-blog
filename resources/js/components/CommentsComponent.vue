@@ -106,10 +106,24 @@ export default {
       }
     );
 
-    Echo.private(`comments.` + this.post_id).listen(
-      "CommentEvent",
+    Echo.channel(`likes.new.` + this.post_id).listen(
+      "NewLike",
       (e) => {
-        console.log(e.comment.author + " Commented on your post!!");
+        this.likes_count++;
+      }
+    );
+
+    Echo.channel(`likes.deleted.` + this.post_id).listen(
+      "LikeDeleted",
+      (e) => {
+        this.likes_count--;
+      }
+    );
+
+    Echo.channel(`views.` + this.post_id).listen(
+      "NewView",
+      (e) => {
+        this.views_count++;
       }
     );
   },
@@ -122,6 +136,7 @@ export default {
           this.comments_count = response.data.comments_count;
           this.likes_count = response.data.likes_count;
           this.post_liked = response.data.post_liked;
+          this.views_count = response.data.views_count;
         })
         .catch(function (error) {
           console.log(error);

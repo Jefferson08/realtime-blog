@@ -2009,8 +2009,14 @@ __webpack_require__.r(__webpack_exports__);
       });
       _this.comments_count--;
     });
-    Echo["private"]("comments." + this.post_id).listen("CommentEvent", function (e) {
-      console.log(e.comment.author + " Commented on your post!!");
+    Echo.channel("likes.new." + this.post_id).listen("NewLike", function (e) {
+      _this.likes_count++;
+    });
+    Echo.channel("likes.deleted." + this.post_id).listen("LikeDeleted", function (e) {
+      _this.likes_count--;
+    });
+    Echo.channel("views." + this.post_id).listen("NewView", function (e) {
+      _this.views_count++;
     });
   },
   methods: {
@@ -2022,6 +2028,7 @@ __webpack_require__.r(__webpack_exports__);
         _this2.comments_count = response.data.comments_count;
         _this2.likes_count = response.data.likes_count;
         _this2.post_liked = response.data.post_liked;
+        _this2.views_count = response.data.views_count;
       })["catch"](function (error) {
         console.log(error);
       });

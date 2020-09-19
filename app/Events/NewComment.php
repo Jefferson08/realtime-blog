@@ -34,10 +34,7 @@ class NewComment implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return [
-            new Channel('comments.' . $this->comment->post_id),
-            new PrivateChannel('comments.' . $this->comment->post_id)
-        ];
+        return new Channel('comments.' . $this->comment->post_id);
     }
 
     /**

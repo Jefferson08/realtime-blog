@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Category;
+use App\Events\LikeDeleted;
+use App\Events\NewLike;
+use App\Events\NewView;
 use App\Like;
 use App\Post;
 use Illuminate\Http\Request;
@@ -119,6 +122,8 @@ class PostController extends Controller
 
         $post->increment('views_count');
 
+        broadcast(new NewView($post->id))->toOthers();
+
         return view('post')->with($data);
     }
 
@@ -201,6 +206,8 @@ class PostController extends Controller
         if ($post->liked()) {
 
             $post->likes->where('user_id', $user_id)->first()->delete();
+
+            broadcast(new LikeDeleted($post->id))->toOthers();
             
             $response['success'] = true;
             $response['message'] = "Post Unliked";
@@ -211,6 +218,8 @@ class PostController extends Controller
             $like->post_id = $post->id;
             $like->user_id = $user_id;
             $like->save();
+
+            broadcast(new NewLike($like->post_id))->toOthers();
 
             $response['success'] = true;
             $response['liked'] = true;
