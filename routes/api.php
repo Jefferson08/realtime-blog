@@ -18,6 +18,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::post('like/{post}', 'PostController@like');
 
 Route::get('comments/{post}', 'CommentsController@index');
 Route::post('comments/{post}', 'CommentsController@store');

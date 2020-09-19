@@ -30,6 +30,8 @@ class CommentsController extends Controller
         $data = array();
         $data['comments'] = array();
         $data['comments_count'] = $post->comments->count();
+        $data['likes_count'] = $post->likes->count();
+        $data['post_liked'] = $post->liked();
 
         $comments = Comment::with('author')->where('post_id', $post->id)->orderBy('created_at', 'DESC')->paginate(3);
 

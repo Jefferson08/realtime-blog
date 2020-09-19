@@ -25,8 +25,6 @@ Route::get('/home', function(){
     return redirect('posts');
 })->name('home');
 
-Route::get('/like/{post}', 'PostController@like')->name('like');
-
 Route::get('/users/{user}', 'UserController@edit')->name('users.edit');
 Route::put('/users/{user}', 'UserController@update')->name('users.update');
 Route::post('/users/media', 'UserController@storeMedia')->name('users.profile.storeMedia');

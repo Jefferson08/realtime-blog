@@ -1961,23 +1961,40 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       comments: [],
       comments_count: 0,
+      likes_count: 0,
+      views_count: 0,
+      post_liked: false,
       page: 2,
-      page_index_count: 1,
       message: "",
       loading: false
     };
   },
+  props: ['post_id'],
   mounted: function mounted() {
     var _this = this;
 
     console.log("Component mounted.");
     this.loadComments();
-    Echo.channel("comments." + this.$attrs.post_id).listen("NewComment", function (e) {
+    Echo.channel("comments." + this.post_id).listen("NewComment", function (e) {
       _this.comments_count++;
 
       _this.comments.unshift(e.comment);
@@ -1986,13 +2003,13 @@ __webpack_require__.r(__webpack_exports__);
         _this.comments.pop();
       }
     });
-    Echo.channel("comment.deleted." + this.$attrs.post_id).listen("CommentDeleted", function (e) {
+    Echo.channel("comment.deleted." + this.post_id).listen("CommentDeleted", function (e) {
       _this.comments = _this.comments.filter(function (comment) {
         return comment.id !== e.comment.id;
       });
       _this.comments_count--;
     });
-    Echo["private"]("comments." + this.$attrs.post_id).listen("CommentEvent", function (e) {
+    Echo["private"]("comments." + this.post_id).listen("CommentEvent", function (e) {
       console.log(e.comment.author + " Commented on your post!!");
     });
   },
@@ -2000,9 +2017,11 @@ __webpack_require__.r(__webpack_exports__);
     loadComments: function loadComments() {
       var _this2 = this;
 
-      axios.get("/api/comments/" + this.$attrs.post_id).then(function (response) {
+      axios.get("/api/comments/" + this.post_id).then(function (response) {
         _this2.comments = response.data.comments;
         _this2.comments_count = response.data.comments_count;
+        _this2.likes_count = response.data.likes_count;
+        _this2.post_liked = response.data.post_liked;
       })["catch"](function (error) {
         console.log(error);
       });
@@ -2010,7 +2029,7 @@ __webpack_require__.r(__webpack_exports__);
     addComment: function addComment() {
       var _this3 = this;
 
-      axios.post("/api/comments/" + this.$attrs.post_id, {
+      axios.post("/api/comments/" + this.post_id, {
         message: this.message
       }).then(function (response) {
         _this3.comments.unshift(response.data);
@@ -2026,7 +2045,7 @@ __webpack_require__.r(__webpack_exports__);
       var _this4 = this;
 
       this.loading = true;
-      axios.get("/api/comments/" + this.$attrs.post_id + "?page=" + this.page).then(function (response) {
+      axios.get("/api/comments/" + this.post_id + "?page=" + this.page).then(function (response) {
         if (response.data.comments.length !== 0) {
           response.data.comments.map(function (comment) {
             _this4.comments.push(comment);
@@ -2057,6 +2076,25 @@ __webpack_require__.r(__webpack_exports__);
           }
         });
       }
+    },
+    likePost: function likePost() {
+      var _this6 = this;
+
+      axios.post("/api/like/" + this.post_id).then(function (response) {
+        if (response.data.success === true) {
+          if (response.data.liked === true) {
+            _this6.post_liked = !_this6.post_liked;
+            _this6.likes_count++;
+          } else {
+            _this6.post_liked = !_this6.post_liked;
+            _this6.likes_count--;
+          }
+        }
+      })["catch"](function (error) {
+        if (error.response.status == 401) {
+          alert("You must be logged in to like a post!!");
+        }
+      });
     }
   }
 });
@@ -43714,132 +43752,166 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "container" }, [
-    _c("h3", { staticClass: "mb-4 font-weight-bold" }, [
-      _vm._v(_vm._s(_vm.comments_count) + " Comments")
-    ]),
-    _vm._v(" "),
     _c(
-      "ul",
-      { staticClass: "comment-list" },
-      _vm._l(_vm.comments, function(comment) {
-        return _c("li", { key: comment.id, staticClass: "comment" }, [
-          _c("div", { staticClass: "vcard bio" }, [
-            _c("img", {
-              attrs: { src: comment.profile_photo, alt: "Image placeholder" }
-            })
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "comment-body" }, [
-            _c("div", { staticClass: "row" }, [
-              _c("div", { staticClass: "col-6" }, [
-                _c("h3", [_vm._v(_vm._s(comment.author))])
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "col-6 text-right" }, [
-                comment.can_delete
-                  ? _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-danger",
-                        on: {
-                          click: function($event) {
-                            return _vm.deleteComment(comment)
-                          }
-                        }
-                      },
-                      [_vm._v("Delete")]
-                    )
-                  : _vm._e()
-              ])
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "meta" }, [
-              _vm._v(_vm._s(comment.created_at))
-            ]),
-            _vm._v(" "),
-            _c("p", [_vm._v(_vm._s(comment.body))])
-          ])
-        ])
-      }),
-      0
-    ),
-    _vm._v(" "),
-    _c(
-      "button",
+      "div",
       {
-        staticClass: "btn btn-success",
-        staticStyle: { width: "100%" },
-        on: {
-          click: function($event) {
-            return _vm.loadMoreComments()
-          }
-        }
+        staticClass: "half order-md-left text-md-left",
+        staticStyle: { width: "100%" }
       },
       [
-        this.loading
-          ? _c("div", {
-              staticClass: "spinner-border",
-              attrs: { role: "status" }
-            })
-          : _c("span", [_vm._v("Load more comments")])
+        _c("p", { staticClass: "meta" }, [
+          _c("span", [
+            _c(
+              "i",
+              {
+                class: [_vm.post_liked ? "icon-heart" : "icon-heart-o"],
+                on: {
+                  click: function($event) {
+                    return _vm.likePost()
+                  }
+                }
+              },
+              [_vm._v(" " + _vm._s(_vm.likes_count))]
+            )
+          ]),
+          _vm._v(" "),
+          _c("span", [
+            _c("i", { staticClass: "icon-eye" }, [
+              _vm._v(" " + _vm._s(_vm.views_count))
+            ])
+          ])
+        ])
       ]
     ),
     _vm._v(" "),
-    _c("hr"),
-    _vm._v(" "),
-    _c("div", { staticClass: "comment-form-wrap pt-2" }, [
-      _c("h3", { staticClass: "mb-3" }, [_vm._v("Leave a comment")]),
+    _c("div", { staticClass: "pt-2 mt-2", staticStyle: { width: "100%" } }, [
+      _c("h3", { staticClass: "mb-4 font-weight-bold" }, [
+        _vm._v(_vm._s(_vm.comments_count) + " Comments")
+      ]),
       _vm._v(" "),
       _c(
-        "form",
+        "ul",
+        { staticClass: "comment-list" },
+        _vm._l(_vm.comments, function(comment) {
+          return _c("li", { key: comment.id, staticClass: "comment" }, [
+            _c("div", { staticClass: "vcard bio" }, [
+              _c("img", {
+                attrs: { src: comment.profile_photo, alt: "Image placeholder" }
+              })
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "comment-body" }, [
+              _c("div", { staticClass: "row" }, [
+                _c("div", { staticClass: "col-6" }, [
+                  _c("h3", [_vm._v(_vm._s(comment.author))])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-6 text-right" }, [
+                  comment.can_delete
+                    ? _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-danger",
+                          on: {
+                            click: function($event) {
+                              return _vm.deleteComment(comment)
+                            }
+                          }
+                        },
+                        [_vm._v("Delete")]
+                      )
+                    : _vm._e()
+                ])
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "meta" }, [
+                _vm._v(_vm._s(comment.created_at))
+              ]),
+              _vm._v(" "),
+              _c("p", [_vm._v(_vm._s(comment.body))])
+            ])
+          ])
+        }),
+        0
+      ),
+      _vm._v(" "),
+      _c(
+        "button",
         {
-          staticClass: "p-3 bg-light",
+          staticClass: "btn btn-success",
+          staticStyle: { width: "100%" },
           on: {
-            submit: function($event) {
-              $event.preventDefault()
+            click: function($event) {
+              return _vm.loadMoreComments()
             }
           }
         },
         [
-          _c("div", { staticClass: "form-group" }, [
-            _c("label", { attrs: { for: "message" } }, [_vm._v("Message")]),
-            _vm._v(" "),
-            _c("textarea", {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: _vm.message,
-                  expression: "message"
-                }
-              ],
-              staticClass: "form-control",
-              attrs: { id: "message", cols: "30", rows: "5" },
-              domProps: { value: _vm.message },
-              on: {
-                input: function($event) {
-                  if ($event.target.composing) {
-                    return
-                  }
-                  _vm.message = $event.target.value
-                }
-              }
-            })
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "form-group" }, [
-            _c("input", {
-              staticClass: "btn py-3 px-4 btn-primary",
-              attrs: { type: "submit", value: "Post Comment" },
-              on: {
-                click: function($event) {
-                  return _vm.addComment()
-                }
-              }
-            })
-          ])
+          this.loading
+            ? _c("div", {
+                staticClass: "spinner-border",
+                attrs: { role: "status" }
+              })
+            : _c("span", [_vm._v("Load more comments")])
         ]
-      )
+      ),
+      _vm._v(" "),
+      _c("hr"),
+      _vm._v(" "),
+      _c("div", { staticClass: "comment-form-wrap pt-2" }, [
+        _c("h3", { staticClass: "mb-3" }, [_vm._v("Leave a comment")]),
+        _vm._v(" "),
+        _c(
+          "form",
+          {
+            staticClass: "p-3 bg-light",
+            on: {
+              submit: function($event) {
+                $event.preventDefault()
+              }
+            }
+          },
+          [
+            _c("div", { staticClass: "form-group" }, [
+              _c("label", { attrs: { for: "message" } }, [_vm._v("Message")]),
+              _vm._v(" "),
+              _c("textarea", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.message,
+                    expression: "message"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: { id: "message", cols: "30", rows: "5" },
+                domProps: { value: _vm.message },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.message = $event.target.value
+                  }
+                }
+              })
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "form-group" }, [
+              _c("input", {
+                staticClass: "btn py-3 px-4 btn-primary",
+                attrs: { type: "submit", value: "Post Comment" },
+                on: {
+                  click: function($event) {
+                    return _vm.addComment()
+                  }
+                }
+              })
+            ])
+          ]
+        )
+      ])
     ])
   ])
 }

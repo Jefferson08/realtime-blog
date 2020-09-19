@@ -8,44 +8,30 @@
                 <div class="row pt-md-4">
                     <div class="container">
                         <h1 class="mb-3"style="width: 100%;">{{$post->title}}</h1>
-                    <p>{{$post->body}}</p>
-                   
-                    <div class="author mb-2 d-flex align-items-center" style="width: 100%;">
-                        <div class="info">
-                            <span>Written by</span>
-                            <h3><a href="#">{{$post->author->name}}</a>, <span>{{$post->created_at->format('F j, Y')}}</span></h3>
-                        </div>
-                    </div>
-
-                    <hr style="width: 100%;">
+                        <p>{{$post->body}}</p>
                     
-                    <div class="tag-widget post-tag-container mb-3 mt-3" style="width: 100%;">
-                        <div class="tagcloud">
-                           @isset($tags)
-                            @foreach ($tags as $tag)
-                            <a href="#" class="tag-cloud-link">{{$tag}}</a>
-                            @endforeach
-                           @endisset
+                        <div class="author mb-2 d-flex align-items-center" style="width: 100%;">
+                            <div class="info">
+                                <span>Written by</span>
+                                <h3><a href="#">{{$post->author->name}}</a>, <span>{{$post->created_at->format('F j, Y')}}</span></h3>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="half order-md-left text-md-left" style="width: 100%;">
-                        <p class="meta">
-                            <span>
-                                <i class="{{ ($post->liked()) ? "icon-heart" : "icon-heart-o"}}" id="like"> {{$post->likes->count()}}</i> 
-                            </span>
-                            <span><i class="icon-eye"> {{$post->views_count}}</i></span>
-                        </p>
-                    </div>
+                        <hr style="width: 100%;">
+                        
+                        <div class="tag-widget post-tag-container mb-3 mt-3" style="width: 100%;">
+                            <div class="tagcloud">
+                            @isset($tags)
+                                @foreach ($tags as $tag)
+                                <a href="#" class="tag-cloud-link">{{$tag}}</a>
+                                @endforeach
+                            @endisset
+                            </div>
+                        </div>
 
-                    <div class="pt-2 mt-2" style="width: 100%;">
                         <div id="app">
                             <comments-component v-bind:post_id="{{$post->id}}"></comments-component>
                         </div>
-                        
-                        <!-- END comment-list -->
-                    
-                    </div>
                     </div>
                 </div><!-- END-->
             </div>
@@ -92,48 +78,5 @@
         </div>
     </div>
 </section>
-
-@section('scripts')
-   <script>
-
-       
-
-        function toggleLike() {
-            $('#like').toggleClass("icon-heart-o")
-            $('#like').toggleClass("icon-heart")
-        }
-
-        $(function(){
-            $('#like').click(function(){
-                $.ajax({
-                    url: "{{route('like', $post)}}",
-                    type: "GET",
-                    dataType: "json",
-                    success: function(response){
-                        if (response.success === true) {
-                            if (response.liked === true) {
-                                toggleLike();
-                                var likes = parseInt($('#like').html());
-                                likes++;
-                                $('#like').html(" "+ likes);
-                            } else {
-                                toggleLike();
-                                var likes = parseInt($('#like').html());
-                                likes--;
-                                $('#like').html(" "+ likes);
-                            }
-                        }
-                    },
-                    statusCode:{
-                        401: function(){
-                            alert("You must be logged in to like this post!!!");
-                            window.location.href = "{{route('login')}}";
-                        }
-                    }
-                });
-            });
-        });
-   </script>
-@endsection
 
 @endsection
