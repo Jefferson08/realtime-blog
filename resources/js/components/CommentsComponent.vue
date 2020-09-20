@@ -153,7 +153,17 @@ export default {
         })
         .catch((error) => {
           if (error.response.status == 401) {
-            alert("You must be logged in to post a comment");
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text: 'You must be logged in to post a comment!',
+              confirmButtonText: 'Login...',
+              showCloseButton: true
+            }).then((result) => {
+              if (result.isConfirmed) {
+                window.location.href = "/login";
+              } 
+            })
           }
         });
     },
@@ -178,22 +188,51 @@ export default {
         });
     },
     deleteComment: function (comment) {
-     if(window.confirm("Are you sure you want to delete this comment?")){
-        axios
-        .delete("/api/comments/" + comment.id)
-        .then((response) => {
-          alert(response.data.message);
-          this.comments.splice(this.comments.indexOf(comment), 1);
-          this.comments_count--;
-        })
-        .catch((error) => {
-          if (error.response.status == 401) {
-            alert("You must be logged in to delete a comment");
-          } else if(error.response.status == 403){
-            alert("Unauthorized");
-          }
-        });
-     }
+      Swal.fire({
+        icon: 'question',
+        title: 'Are you sure you want to delete this comment?',
+        showDenyButton: true,
+        confirmButtonText: `Yes`,
+        denyButtonText: `Cancel`,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          axios
+            .delete("/api/comments/" + comment.id)
+            .then((response) => {
+              
+              this.comments.splice(this.comments.indexOf(comment), 1);
+              this.comments_count--;
+
+              Swal.fire({
+                icon: 'success',
+                title: response.data.message,
+                showConfirmButton: true,
+                timer: 1500
+              })
+            })
+            .catch((error) => {
+              if (error.response.status == 401) {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Oops...',
+                  text: 'You must be logged in to delete a comment!',
+                  confirmButtonText: 'Login...',
+                  showCloseButton: true
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    window.location.href = "/login";
+                  } 
+                })
+              } else if(error.response.status == 403){
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Oops...',
+                  text: 'Unauthorized!',
+                })
+              }
+            });
+        }
+      })
     },
     likePost: function() {
       axios
@@ -211,7 +250,17 @@ export default {
         })
         .catch((error) => {
           if (error.response.status == 401) {
-            alert("You must be logged in to like a post!!");
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text: 'You must be logged in to like a post!',
+              confirmButtonText: 'Login...',
+              showCloseButton: true
+            }).then((result) => {
+              if (result.isConfirmed) {
+                window.location.href = "/login";
+              } 
+            })
           }
         });
     }

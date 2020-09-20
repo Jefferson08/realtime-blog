@@ -112,7 +112,7 @@
                         <ul class="categories">
                             
                             @foreach ($categories as $category)
-                                <li><a href="{{route('home', ['category' => $category->id])}}">{{$category->title}}<span>({{$category->posts->count()}})</span></a></li>
+                                <li><a href="{{route('posts.index', ['category' => $category->id])}}">{{$category->title}}<span>({{$category->posts->count()}})</span></a></li>
                             @endforeach
                             
                         </ul>

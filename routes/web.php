@@ -14,16 +14,12 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return redirect('home');
-});
+    return redirect('posts');
+})->name('home');
 
 Auth::routes();
 
 Route::resource('posts', 'PostController');
-
-Route::get('/home', function(){
-    return redirect('posts');
-})->name('home');
 
 Route::get('/users/{user}', 'UserController@edit')->name('users.edit');
 Route::put('/users/{user}', 'UserController@update')->name('users.update');
