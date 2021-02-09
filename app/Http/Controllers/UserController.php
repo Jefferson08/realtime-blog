@@ -59,20 +59,15 @@ class UserController extends Controller
         
         $user->save();
 
-        if ($request->input('photo', false)) {
+        if (!($request->input('photo'))) {
 
-            if(file_exists(storage_path('tmp/uploads/' . $request->input('photo')))){
+            echo("Removu a foto, deletar");
 
-                if ($user->photo) {
-                    $user->photo->delete();
-                }
-
-                $user->addMedia(storage_path('tmp/uploads/' . $request->input('photo')))->toMediaCollection('profile');
+            if ($user->photo) {
+                $user->photo->delete();
             }
 
-        } elseif ($user->photo) {
-            $user->photo->delete();
-        }
+        } 
 
         return redirect()->route('users.edit', $user)->with('success', 'Dados alterados com sucesso!!!');
 

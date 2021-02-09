@@ -103,7 +103,7 @@
 
 <script>
     Dropzone.options.photoDropzone = {
-    url: '{{ route('users.profile.storeMedia') }}',
+    url: '{{ route('users.profile.storeMedia', $user) }}',
     maxFilesize: 2, // MB
     acceptedFiles: '.jpeg,.jpg,.png,.gif',
     maxFiles: 1,

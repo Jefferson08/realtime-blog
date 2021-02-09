@@ -23,6 +23,6 @@ Route::resource('posts', 'PostController');
 
 Route::get('/users/{user}', 'UserController@edit')->name('users.edit');
 Route::put('/users/{user}', 'UserController@update')->name('users.update');
-Route::post('/users/media', 'UserController@storeMedia')->name('users.profile.storeMedia');
+Route::post('/users/media/{user}', 'UserController@storeMedia')->name('users.profile.storeMedia');
 
 Route::get('myposts', 'UserController@posts')->name('myposts');
